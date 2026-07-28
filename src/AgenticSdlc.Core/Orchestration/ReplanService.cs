@@ -6,16 +6,59 @@ using Microsoft.EntityFrameworkCore;
 namespace AgenticSdlc.Core.Orchestration;
 
 /// <summary>
-/// Invalidates work when an upstream artifact changes (spec §4.6, FR-12). Operates on the caller's
-/// db context so the change is part of one transaction. Downstream succeeded/awaiting/failed nodes
-/// are reset to Pending, their artifacts superseded (lineage retained), and their pending approvals
-/// voided — so re-run nodes request approval afresh and governance is preserved under re-planning.
-/// WP-7 layers rollback and broader triggers on top.
+/// Invalidates work when an upstream artifact changes (spec §4.6, FR-12). The context-based helpers
+/// operate on the caller's db context so a change is part of one transaction (used by the approval
+/// flow); the self-contained <see cref="ReplanFromNodeAsync"/> is the standalone trigger the API and
+/// rollback use. Downstream succeeded/awaiting/failed nodes are reset to Pending, their artifacts
+/// superseded (lineage retained), and their approvals voided — so re-run nodes request approval
+/// afresh and governance is preserved under re-planning.
 /// </summary>
 public sealed class ReplanService
 {
     private readonly AuditLogger _audit;
-    public ReplanService(AuditLogger audit) => _audit = audit;
+    private readonly IDbContextFactory<AgenticDbContext> _dbFactory;
+    private readonly WorkflowSignaler _signaler;
+
+    public ReplanService(AuditLogger audit, IDbContextFactory<AgenticDbContext> dbFactory, WorkflowSignaler signaler)
+    {
+        _audit = audit;
+        _dbFactory = dbFactory;
+        _signaler = signaler;
+    }
+
+    /// <summary>
+    /// Standalone re-plan trigger: resets the target node for re-run, supersedes its artifacts, voids
+    /// its approvals, invalidates everything downstream, reactivates a terminal workflow, and signals
+    /// the engine. <paramref name="trigger"/> distinguishes a re-plan from a rollback in the audit log.
+    /// </summary>
+    public async Task ReplanFromNodeAsync(Guid workflowId, Guid nodeId, string reason, AuditEventType trigger, CancellationToken ct = default)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        var node = await db.Nodes.FirstOrDefaultAsync(n => n.Id == nodeId && n.WorkflowId == workflowId, ct)
+                   ?? throw new InvalidOperationException($"Node {nodeId} not found in workflow {workflowId}.");
+
+        node.Status = NodeStatus.Pending;
+        node.Attempt = 0;
+        node.NextRetryAt = null;
+        node.CompletedAt = null;
+        node.ErrorMessage = null;
+        await SupersedeNodeArtifactsAsync(db, nodeId, ct);
+        await VoidNodeApprovalsAsync(db, nodeId, ct);
+        await MarkDownstreamStaleAsync(db, workflowId, nodeId, reason, ct);
+
+        // Reactivate a finished workflow so the engine picks the re-run up.
+        var wf = await db.Workflows.FirstAsync(w => w.Id == workflowId, ct);
+        if (wf.Status is WorkflowStatus.Completed or WorkflowStatus.Failed)
+        {
+            wf.Status = WorkflowStatus.Running;
+            wf.CompletedAt = null;
+            wf.FailureReason = null;
+        }
+
+        await _audit.LogAsync(workflowId, nodeId, trigger, "system", $"{trigger} from '{node.Key}': {reason}", ct: ct);
+        await db.SaveChangesAsync(ct);
+        _signaler.Signal(workflowId);
+    }
 
     /// <summary>Supersedes a single node's current artifacts (used when the node itself will re-run).</summary>
     public async Task SupersedeNodeArtifactsAsync(AgenticDbContext db, Guid nodeId, CancellationToken ct)

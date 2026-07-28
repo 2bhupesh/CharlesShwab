@@ -18,6 +18,8 @@ public sealed class WorkflowService
     private readonly WorkflowSignaler _signaler;
     private readonly WorkflowCancellationRegistry _cancellation;
     private readonly AuditLogger _audit;
+    private readonly ReplanService _replan;
+    private readonly RollbackService _rollback;
     private readonly CoreOptions _options;
 
     public WorkflowService(
@@ -26,6 +28,8 @@ public sealed class WorkflowService
         WorkflowSignaler signaler,
         WorkflowCancellationRegistry cancellation,
         AuditLogger audit,
+        ReplanService replan,
+        RollbackService rollback,
         CoreOptions options)
     {
         _dbFactory = dbFactory;
@@ -33,6 +37,8 @@ public sealed class WorkflowService
         _signaler = signaler;
         _cancellation = cancellation;
         _audit = audit;
+        _replan = replan;
+        _rollback = rollback;
         _options = options;
     }
 
@@ -108,6 +114,14 @@ public sealed class WorkflowService
         await _audit.LogAsync(id, null, AuditEventType.WorkflowResumed, "system", "Workflow resumed.");
         _signaler.Signal(id); // a fresh cancellation token is created lazily on next dispatch
     }
+
+    /// <summary>Re-runs a node and invalidates everything downstream (dynamic re-planning, FR-12).</summary>
+    public Task ReplanFromNodeAsync(Guid id, Guid nodeId, string reason, CancellationToken ct = default) =>
+        _replan.ReplanFromNodeAsync(id, nodeId, reason, AuditEventType.ReplanTriggered, ct);
+
+    /// <summary>Compensating rollback of a node's effects, re-running it and its dependents (FR-24).</summary>
+    public Task RollbackNodeAsync(Guid id, Guid nodeId, string reason, CancellationToken ct = default) =>
+        _rollback.RollbackNodeAsync(id, nodeId, reason, ct);
 
     public async Task CancelAsync(Guid id, CancellationToken ct = default)
     {

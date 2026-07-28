@@ -65,6 +65,7 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IGatePolicy, ChangeControlPolicy>();
         services.AddSingleton<IGateEvaluator, GateEvaluator>();
         services.AddSingleton<ReplanService>();
+        services.AddSingleton<RollbackService>();
         services.AddSingleton<ApprovalService>();
 
         // Observability.

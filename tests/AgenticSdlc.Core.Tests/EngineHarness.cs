@@ -48,7 +48,8 @@ public sealed class EngineHarness
         var audit = new AuditLogger(db.Factory);
         var contextBuilder = new WorkflowContextBuilder(db.Factory, options);
         var graphBuilder = new GraphBuilder(db.Factory, options);
-        var replan = new ReplanService(audit);
+        var replan = new ReplanService(audit, db.Factory, signaler);
+        var rollback = new RollbackService(replan);
 
         IGateEvaluator gates;
         ApprovalService? approvals = null;
@@ -73,7 +74,7 @@ public sealed class EngineHarness
         var registry = new AgentRegistry(agents);
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
         var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options);
-        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, options);
+        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, options);
 
         return new EngineHarness(db, options, service, engine, approvals);
     }
@@ -95,7 +96,8 @@ public sealed class EngineHarness
         var audit = new AuditLogger(db.Factory);
         var contextBuilder = new WorkflowContextBuilder(db.Factory, options);
         var graphBuilder = new GraphBuilder(db.Factory, options);
-        var replan = new ReplanService(audit);
+        var replan = new ReplanService(audit, db.Factory, signaler);
+        var rollback = new RollbackService(replan);
         var workspace = new WorkspaceManager();
         var cli = new DotnetCliRunner();
         ILlmProvider llm = new MockLlmProvider(new MockResponseCatalog());
@@ -125,7 +127,7 @@ public sealed class EngineHarness
         var registry = new AgentRegistry(agents);
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
         var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options);
-        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, options);
+        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, options);
 
         return new EngineHarness(db, options, service, engine, approvals);
     }

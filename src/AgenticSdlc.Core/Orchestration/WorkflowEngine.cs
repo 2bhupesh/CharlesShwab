@@ -56,6 +56,35 @@ public sealed class WorkflowEngine
         }
     }
 
+    /// <summary>
+    /// Restart recovery (FR-9): resets nodes left <see cref="NodeStatus.Running"/> by a crashed process
+    /// — their in-flight tasks died — back to Pending, then re-signals active workflows so execution
+    /// resumes. Runs once at startup and is safe to call at any time.
+    /// </summary>
+    public async Task RecoverAsync(CancellationToken ct = default)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync(ct);
+        var stranded = await db.Nodes.Where(n => n.Status == NodeStatus.Running).ToListAsync(ct);
+        foreach (var n in stranded)
+        {
+            n.Status = NodeStatus.Pending;
+            n.StartedAt = null;
+        }
+        if (stranded.Count > 0)
+            await db.SaveChangesAsync(ct);
+
+        foreach (var n in stranded)
+            await _audit.LogAsync(n.WorkflowId, n.Id, AuditEventType.NodeRecoveredAfterRestart, "system",
+                $"Node '{n.Key}' reset to Pending after restart.", ct: ct);
+
+        var active = await db.Workflows
+            .Where(w => w.Status == WorkflowStatus.Running || w.Status == WorkflowStatus.AwaitingApproval)
+            .Select(w => w.Id)
+            .ToListAsync(ct);
+        foreach (var id in active)
+            _signaler.Signal(id);
+    }
+
     /// <summary>Ticks every workflow currently Running or AwaitingApproval (periodic sweep + recovery).</summary>
     public async Task TickAllActiveAsync(CancellationToken ct = default)
     {
