@@ -65,3 +65,8 @@ C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\refint\AgenticSdlc
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\AgenticSdlc.Web.pdb
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\AgenticSdlc.Web.genruntimeconfig.cache
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\ref\AgenticSdlc.Web.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\AgenticSdlc.Web.staticwebassets.runtime.json
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\Microsoft.OpenApi.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\AgenticSdlc.Web.MvcApplicationPartsAssemblyInfo.cs
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\2e1e5yq8z6-{0}-2wqvqwdvhz-2wqvqwdvhz.gz

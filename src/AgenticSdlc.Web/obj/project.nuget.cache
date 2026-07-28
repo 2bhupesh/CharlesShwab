@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "M4TZ0Iw/1G8=",
+  "dgSpecHash": "U/8qEb6CrJ8=",
   "success": true,
   "projectFilePath": "C:\\Bhupesh\\CharlesShwab\\src\\AgenticSdlc.Web\\AgenticSdlc.Web.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\bhupe\\.nuget\\packages\\anthropic\\12.39.0\\anthropic.12.39.0.nupkg.sha512",
+    "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.10\\microsoft.aspnetcore.openapi.10.0.10.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.data.sqlite.core\\10.0.10\\microsoft.data.sqlite.core.10.0.10.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.10\\microsoft.entityframeworkcore.10.0.10.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.10\\microsoft.entityframeworkcore.abstractions.10.0.10.nupkg.sha512",
@@ -14,12 +15,25 @@
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.entityframeworkcore.sqlite.core\\10.0.10\\microsoft.entityframeworkcore.sqlite.core.10.0.10.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.extensions.ai.abstractions\\10.5.1\\microsoft.extensions.ai.abstractions.10.5.1.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.10\\microsoft.extensions.dependencymodel.10.0.10.nupkg.sha512",
+    "C:\\Users\\bhupe\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.11\\sqlitepclraw.bundle_e_sqlite3.2.1.11.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\sqlitepclraw.core\\2.1.11\\sqlitepclraw.core.2.1.11.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.11\\sqlitepclraw.lib.e_sqlite3.2.1.11.nupkg.sha512",
     "C:\\Users\\bhupe\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.11\\sqlitepclraw.provider.e_sqlite3.2.1.11.nupkg.sha512"
   ],
   "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "projectPath": "C:\\Bhupesh\\CharlesShwab\\src\\AgenticSdlc.Web\\AgenticSdlc.Web.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Bhupesh\\CharlesShwab\\src\\AgenticSdlc.Web\\AgenticSdlc.Web.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
     {
       "code": "NU1903",
       "level": "Warning",

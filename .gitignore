@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+
+# Runtime data (regenerated at startup)
+data/
+workspaces/
+**/workspaces/
+**/data/
+
+# IDE / OS
+.vs/
+*.user
+.DS_Store

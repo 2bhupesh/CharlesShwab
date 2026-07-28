@@ -91,6 +91,20 @@ public static class CoreServiceCollectionExtensions
         return services;
     }
 
+    /// <summary>
+    /// Creates the SQLite database (with WAL) and ensures the workspace/samples directories exist.
+    /// Call once at host startup before serving requests.
+    /// </summary>
+    public static async Task InitializeAgenticSdlcAsync(this IServiceProvider services, CancellationToken ct = default)
+    {
+        var factory = services.GetRequiredService<IDbContextFactory<AgenticDbContext>>();
+        await DbInitializer.InitAsync(factory, ct);
+
+        var options = services.GetRequiredService<CoreOptions>();
+        Directory.CreateDirectory(ResolvePath(options.Workspace.Root));
+        Directory.CreateDirectory(ResolvePath(options.Workspace.SamplesRoot));
+    }
+
     /// <summary>Resolves a possibly-relative configured path against the current working directory.</summary>
     internal static string ResolvePath(string path) =>
         Path.IsPathRooted(path) ? path : Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), path));

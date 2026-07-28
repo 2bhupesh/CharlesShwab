@@ -4,10 +4,17 @@
     <ProjectReference Include="..\AgenticSdlc.Core\AgenticSdlc.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Runtime output (generated projects, SQLite db, brownfield samples) lives under the content
+         root; keep it out of this project's own compilation. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);workspaces\**;data\**;samples\**</DefaultItemExcludes>
   </PropertyGroup>
 
 </Project>
