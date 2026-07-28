@@ -2,15 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Agentic SDLC Platform</title>
+  <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body>
-  <h1>Agentic Software Engineering System</h1>
-  <p>API is running. The dashboard is delivered in WP-11.</p>
-  <ul>
-    <li><a href="/openapi/v1.json">OpenAPI document</a></li>
-    <li><a href="/api/health">Health</a></li>
-    <li><a href="/api/scenarios">Scenarios</a></li>
-  </ul>
+  <header class="topbar">
+    <h1><span class="brand">◆</span> Agentic Software Engineering System</h1>
+    <div class="spacer"></div>
+    <span id="health" class="live"><span class="dot"></span><span class="txt">connecting…</span></span>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2 style="margin-top:0">Start a workflow</h2>
+      <div id="scenarios" class="scenario-cards"></div>
+
+      <label for="name">Name (optional)</label>
+      <input id="name" placeholder="e.g. url-shortener demo" />
+
+      <label for="requirement">Requirement</label>
+      <textarea id="requirement" rows="6" placeholder="Describe the engineering task…"></textarea>
+
+      <div id="brownfield-seed" style="display:none">
+        <label for="source">Seed from a previous greenfield run (optional)</label>
+        <select id="source"><option value="">— none (use bundled sample) —</option></select>
+      </div>
+
+      <div class="controls">
+        <button id="start" class="primary">Start workflow</button>
+      </div>
+    </div>
+
+    <h2>Workflows</h2>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table>
+        <thead><tr><th>Name</th><th>Scenario</th><th>Status</th><th>Phase</th><th>Progress</th><th>Approvals</th><th>Created</th></tr></thead>
+        <tbody id="workflow-list"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module" src="/js/home.js"></script>
 </body>
 </html>

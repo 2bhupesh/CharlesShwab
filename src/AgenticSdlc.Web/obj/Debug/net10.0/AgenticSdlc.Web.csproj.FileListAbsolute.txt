@@ -69,4 +69,15 @@ C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\AgenticSdlc.Web.st
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\bin\Debug\net10.0\Microsoft.OpenApi.dll
 C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\AgenticSdlc.Web.MvcApplicationPartsAssemblyInfo.cs
-C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\2e1e5yq8z6-{0}-2wqvqwdvhz-2wqvqwdvhz.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\wjoovp93h5-{0}-gnbfk4ecur-gnbfk4ecur.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\2e1e5yq8z6-{0}-64tsbt89y8-64tsbt89y8.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\3ruqquiwwi-{0}-xly4l1xfkd-xly4l1xfkd.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\pu670z0fsa-{0}-kg6ig2r3me-kg6ig2r3me.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\a17tadwme4-{0}-5rkkqku18i-5rkkqku18i.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\ibmhezj8ap-{0}-tokrp7c5vd-tokrp7c5vd.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\o89eiti0r9-{0}-86m4nnyfma-86m4nnyfma.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\9c4k2dchs1-{0}-60k2mg070a-60k2mg070a.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\56ggestg4t-{0}-t5c6j9j827-t5c6j9j827.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\3wd51d3vik-{0}-qjvoo406ic-qjvoo406ic.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\an6bmkdbl6-{0}-2wz6gbwkbw-2wz6gbwkbw.gz
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Web\obj\Debug\net10.0\compressed\0bnva5eqa7-{0}-zw17315x3x-zw17315x3x.gz

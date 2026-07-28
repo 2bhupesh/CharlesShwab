@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgenticSdlc.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b82883887e5d4ccadbfe1fc8df5190eb2ad90f33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1f5dd4efbee54c59a1bff88f508f341f31302a57")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgenticSdlc.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgenticSdlc.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

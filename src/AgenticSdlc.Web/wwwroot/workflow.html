@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Workflow · Agentic SDLC</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1><a href="/" style="color:var(--accent)">◆</a> <span id="wf-name">Workflow</span>
+      <span id="wf-status"></span></h1>
+    <div class="spacer"></div>
+    <span id="health" class="live"><span class="dot"></span><span class="txt">connecting…</span></span>
+  </header>
+
+  <div class="container wide">
+    <div id="stepper" class="stepper"></div>
+    <div id="controls" class="controls"></div>
+
+    <div class="split">
+      <div>
+        <div class="graph-wrap"><svg class="dag" id="graph"></svg></div>
+        <div id="gates"></div>
+      </div>
+
+      <div class="card">
+        <div class="tabs" id="tabs"></div>
+        <div id="tab-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-root"></div>
+  <script type="module" src="/js/workflow.js"></script>
+</body>
+</html>
