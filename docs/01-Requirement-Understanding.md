@@ -285,8 +285,10 @@ The build is complete when the following are demonstrable end to end:
 ## 11. Next Deliverables
 
 1. **Architecture & Design Document** — component decomposition, domain model, execution algorithm,
-   governance model, persistence design.
-2. **Implementation Plan** — build sequence, verification per slice. *(drafted at
-   `C:\Users\bhupe\.claude\plans\below-is-the-product-inherited-hopper.md`)*
+   governance model, persistence design. *(see [02-Engineering-Specification.md](02-Engineering-Specification.md)
+   and [06-Architecture-Overview.md](06-Architecture-Overview.md))*
+2. **Implementation Plan** — build sequence, verification per slice.
+   *(see [03-Implementation-Plan.md](03-Implementation-Plan.md))*
 3. **Implementation** — the platform itself.
 4. **Demonstration Guide** — how to run each of the three scenarios.
+   *(see [04-Demonstration-Guide.md](04-Demonstration-Guide.md))*

@@ -64,6 +64,15 @@ public abstract class AgentBase<TOutput> : IAgent
             if (ok)
                 return await MapOutputAsync(value!, input, ctx, ct);
 
+            // If the response hit the output-token cap it was truncated mid-JSON. Re-asking would only
+            // re-truncate (and with a larger context each time, risking a node timeout), so fail fast
+            // with an actionable message instead of the in-conversation reparse.
+            if (response.OutputTokens >= _options.Llm.MaxTokens)
+                throw new AgentOutputException(
+                    $"{Type} agent response was truncated at the {_options.Llm.MaxTokens}-token output cap. " +
+                    "The generated content exceeds the limit — raise AgenticSdlc:Llm:MaxTokens (and, for large " +
+                    "outputs, AgenticSdlc:Orchestration:DefaultNodeTimeoutSeconds).");
+
             lastError = error;
             // Feed the malformed reply back and ask for a clean retry (cheap, in-conversation).
             messages.Add(new("assistant", response.Text));

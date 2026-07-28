@@ -21,7 +21,9 @@ public sealed class LlmOptions
 
     public string Model { get; set; } = "claude-sonnet-5";
 
-    public int MaxTokens { get; set; } = 8000;
+    // Generation agents emit full source files; the real model can exceed a small cap and get its JSON
+    // truncated. 64k output tokens (the Sonnet 4.x ceiling) covers even a large single file. Mock unaffected.
+    public int MaxTokens { get; set; } = 64000;
 
     /// <summary>In-conversation reparse attempts before escalating to a node-level retry.</summary>
     public int MaxJsonRetries { get; set; } = 2;
@@ -35,7 +37,9 @@ public sealed class OrchestrationOptions
     /// <summary>Global cap on concurrently executing nodes.</summary>
     public int MaxParallelNodes { get; set; } = 3;
 
-    public int DefaultNodeTimeoutSeconds { get; set; } = 300;
+    // Large live-model generations are slow (a full 64k-token file can stream for many minutes); 20
+    // minutes leaves room for one to complete rather than timing out.
+    public int DefaultNodeTimeoutSeconds { get; set; } = 1200;
 
     public int MaxAttempts { get; set; } = 3;
 

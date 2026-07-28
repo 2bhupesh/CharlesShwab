@@ -141,10 +141,13 @@ the real `dotnet build`/`dotnet test` on it (~15–40s each), which is how the p
 
 | Document | Contents |
 |---|---|
+| [docs/07-Setup-Instructions.md](docs/07-Setup-Instructions.md) | Prerequisites, build, run, configuration, verification, troubleshooting. |
 | [docs/01-Requirement-Understanding.md](docs/01-Requirement-Understanding.md) | Interpretation of the assignment: 34 FRs, 11 NFRs, ambiguities, assumptions, risks. |
 | [docs/02-Engineering-Specification.md](docs/02-Engineering-Specification.md) | Architecture, domain model, engine algorithm, governance, traceability matrix. |
 | [docs/03-Implementation-Plan.md](docs/03-Implementation-Plan.md) | Work-package build plan and verification. |
 | [docs/04-Demonstration-Guide.md](docs/04-Demonstration-Guide.md) | Step-by-step walkthrough of all three scenarios + resilience demos. |
+| [docs/05-Final-Engineering-Summary.md](docs/05-Final-Engineering-Summary.md) | Capstone: plan/rationale, artifacts, validation, risks, trade-offs, assumptions, limitations. |
+| [docs/06-Architecture-Overview.md](docs/06-Architecture-Overview.md) | Components, orchestration model, control flow, and key architectural decisions (diagram-driven). |
 
 ---
 
