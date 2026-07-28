@@ -1,5 +1,6 @@
 using AgenticSdlc.Core.Agents;
 using AgenticSdlc.Core.Governance;
+using AgenticSdlc.Core.Governance.Policies;
 using AgenticSdlc.Core.Llm;
 using AgenticSdlc.Core.Llm.Mock;
 using AgenticSdlc.Core.Observability;
@@ -47,8 +48,15 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IAgent, EngineeringPlanningAgent>();
         services.AddSingleton<AgentRegistry>();
 
-        // Governance seam: auto-pass until WP-5 replaces it with the real gate evaluator.
-        services.AddSingleton<IGateEvaluator, AutoPassGateEvaluator>();
+        // Governance: real gate evaluator plus the five policies, approval, and re-plan services.
+        services.AddSingleton<IGatePolicy, NoBlockingAmbiguitiesPolicy>();
+        services.AddSingleton<IGatePolicy, BuildMustSucceedPolicy>();
+        services.AddSingleton<IGatePolicy, ValidationPassRatePolicy>();
+        services.AddSingleton<IGatePolicy, SecretScanPolicy>();
+        services.AddSingleton<IGatePolicy, ChangeControlPolicy>();
+        services.AddSingleton<IGateEvaluator, GateEvaluator>();
+        services.AddSingleton<ReplanService>();
+        services.AddSingleton<ApprovalService>();
 
         // Observability.
         services.AddSingleton<AuditLogger>();

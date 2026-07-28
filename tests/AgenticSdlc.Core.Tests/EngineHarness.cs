@@ -3,6 +3,7 @@ using AgenticSdlc.Core;
 using AgenticSdlc.Core.Agents;
 using AgenticSdlc.Core.Domain;
 using AgenticSdlc.Core.Governance;
+using AgenticSdlc.Core.Governance.Policies;
 using AgenticSdlc.Core.Observability;
 using AgenticSdlc.Core.Orchestration;
 using Microsoft.EntityFrameworkCore;
@@ -20,16 +21,20 @@ public sealed class EngineHarness
     public CoreOptions Options { get; }
     public WorkflowService Service { get; }
     public WorkflowEngine Engine { get; }
+    /// <summary>Non-null only when the harness was created with real governance.</summary>
+    public ApprovalService? Approvals { get; }
 
-    private EngineHarness(TestDb db, CoreOptions options, WorkflowService service, WorkflowEngine engine)
+    private EngineHarness(TestDb db, CoreOptions options, WorkflowService service, WorkflowEngine engine, ApprovalService? approvals)
     {
         Db = db;
         Options = options;
         Service = service;
         Engine = engine;
+        Approvals = approvals;
     }
 
-    public static async Task<EngineHarness> CreateAsync(IEnumerable<IAgent> agents, Action<CoreOptions>? configure = null)
+    public static async Task<EngineHarness> CreateAsync(
+        IEnumerable<IAgent> agents, Action<CoreOptions>? configure = null, bool realGovernance = false)
     {
         var db = await TestDb.CreateAsync();
         var options = new CoreOptions();
@@ -40,13 +45,49 @@ public sealed class EngineHarness
         var audit = new AuditLogger(db.Factory);
         var contextBuilder = new WorkflowContextBuilder(db.Factory, options);
         var graphBuilder = new GraphBuilder(db.Factory, options);
-        IGateEvaluator gates = new AutoPassGateEvaluator();
+        var replan = new ReplanService(audit);
+
+        IGateEvaluator gates;
+        ApprovalService? approvals = null;
+        if (realGovernance)
+        {
+            var policies = new IGatePolicy[]
+            {
+                new NoBlockingAmbiguitiesPolicy(db.Factory),
+                new BuildMustSucceedPolicy(db.Factory),
+                new ValidationPassRatePolicy(db.Factory),
+                new SecretScanPolicy(db.Factory),
+                new ChangeControlPolicy(db.Factory),
+            };
+            gates = new GateEvaluator(db.Factory, policies, audit, options);
+            approvals = new ApprovalService(db.Factory, audit, signaler, replan);
+        }
+        else
+        {
+            gates = new AutoPassGateEvaluator();
+        }
+
         var registry = new AgentRegistry(agents);
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
         var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options);
         var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, options);
 
-        return new EngineHarness(db, options, service, engine);
+        return new EngineHarness(db, options, service, engine, approvals);
+    }
+
+    /// <summary>Drives ticks and resolves each pending approval as it appears, until the workflow settles.</summary>
+    public async Task<WorkflowStatus> RunAutoApprovingAsync(Guid workflowId, string approver, TimeSpan timeout)
+    {
+        var sw = Stopwatch.StartNew();
+        while (sw.Elapsed < timeout)
+        {
+            var status = await RunUntilSettledAsync(workflowId, timeout - sw.Elapsed);
+            if (status != WorkflowStatus.AwaitingApproval) return status;
+            var pending = await Approvals!.GetPendingAsync(workflowId);
+            foreach (var a in pending)
+                await Approvals.ApproveAsync(a.Id, approved: true, approver, "looks good", requestChanges: false);
+        }
+        return await StatusAsync(workflowId);
     }
 
     /// <summary>Drives ticks until the workflow reaches a terminal or awaiting state, or times out.</summary>
