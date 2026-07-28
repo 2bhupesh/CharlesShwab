@@ -22,7 +22,8 @@ public sealed class AnthropicLlmProvider : ILlmProvider, IDisposable
         {
             Model = request.Model,                 // implicit string -> ApiEnum<string, Model>
             MaxTokens = request.MaxTokens,
-            Temperature = request.Temperature,
+            // Temperature is intentionally not set: models after Claude Opus 4.6 (incl. sonnet-5)
+            // reject any value other than 1.0. Determinism comes from the structured-output contract.
             System = request.SystemPrompt,          // implicit string -> MessageCreateParamsSystem
             Messages = request.Messages
                 .Select(m => new MessageParam

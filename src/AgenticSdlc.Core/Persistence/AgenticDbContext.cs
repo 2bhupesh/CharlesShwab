@@ -1,5 +1,6 @@
 using AgenticSdlc.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AgenticSdlc.Core.Persistence;
 
@@ -25,9 +26,28 @@ public class AgenticDbContext : DbContext
     public DbSet<RiskItem> Risks => Set<RiskItem>();
     public DbSet<MetricSnapshot> MetricSnapshots => Set<MetricSnapshot>();
 
+    // SQLite has no native DateTimeOffset and cannot ORDER BY it. Store as UTC ticks (long) so
+    // ordering and comparisons translate to SQL. All timestamps are UTC, so no offset is lost.
+    private static readonly ValueConverter<DateTimeOffset, long> DtoToTicks =
+        new(v => v.UtcTicks, v => new DateTimeOffset(v, TimeSpan.Zero));
+    private static readonly ValueConverter<DateTimeOffset?, long?> NullableDtoToTicks =
+        new(v => v.HasValue ? v.Value.UtcTicks : null, v => v.HasValue ? new DateTimeOffset(v.Value, TimeSpan.Zero) : null);
+
     protected override void OnModelCreating(ModelBuilder b)
     {
         // Enums are persisted as readable strings via explicit HasConversion<string>() per property.
+        // DateTimeOffset columns are stored as ticks across every entity (see converters above).
+        foreach (var entity in b.Model.GetEntityTypes())
+        {
+            foreach (var prop in entity.GetProperties())
+            {
+                if (prop.ClrType == typeof(DateTimeOffset))
+                    prop.SetValueConverter(DtoToTicks);
+                else if (prop.ClrType == typeof(DateTimeOffset?))
+                    prop.SetValueConverter(NullableDtoToTicks);
+            }
+        }
+
         b.Entity<Workflow>(e =>
         {
             e.HasKey(x => x.Id);

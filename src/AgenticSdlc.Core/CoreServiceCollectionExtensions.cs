@@ -1,10 +1,14 @@
 using AgenticSdlc.Core.Agents;
+using AgenticSdlc.Core.Governance;
 using AgenticSdlc.Core.Llm;
 using AgenticSdlc.Core.Llm.Mock;
+using AgenticSdlc.Core.Observability;
+using AgenticSdlc.Core.Orchestration;
 using AgenticSdlc.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AgenticSdlc.Core;
 
@@ -42,6 +46,22 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IAgent, RequirementIntelligenceAgent>();
         services.AddSingleton<IAgent, EngineeringPlanningAgent>();
         services.AddSingleton<AgentRegistry>();
+
+        // Governance seam: auto-pass until WP-5 replaces it with the real gate evaluator.
+        services.AddSingleton<IGateEvaluator, AutoPassGateEvaluator>();
+
+        // Observability.
+        services.AddSingleton<AuditLogger>();
+
+        // Orchestration engine and its background runner.
+        services.AddSingleton<WorkflowSignaler>();
+        services.AddSingleton<WorkflowCancellationRegistry>();
+        services.AddSingleton<WorkflowContextBuilder>();
+        services.AddSingleton<GraphBuilder>();
+        services.AddSingleton<NodeExecutor>();
+        services.AddSingleton<WorkflowEngine>();
+        services.AddSingleton<WorkflowService>();
+        services.AddHostedService<WorkflowRunnerService>();
 
         return services;
     }
