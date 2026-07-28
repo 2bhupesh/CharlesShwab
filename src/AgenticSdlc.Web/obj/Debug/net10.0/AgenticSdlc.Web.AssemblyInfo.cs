@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgenticSdlc.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6e8168a5fe3f7e9352da1c1cd2bd7e48645203d3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b82883887e5d4ccadbfe1fc8df5190eb2ad90f33")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgenticSdlc.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgenticSdlc.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

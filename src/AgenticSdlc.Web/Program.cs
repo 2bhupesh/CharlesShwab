@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using AgenticSdlc.Core;
 using AgenticSdlc.Web.Api;
+using AgenticSdlc.Web.Realtime;
 using AgenticSdlc.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,10 @@ builder.Services.AddAgenticSdlcCore(builder.Configuration);
 // Delivery-surface services.
 builder.Services.AddSingleton<ScenarioCatalog>();
 builder.Services.AddSingleton<ReadModel>();
+
+// Real-time event fan-out (Core event bus → SSE clients).
+builder.Services.AddSingleton<EventBroadcaster>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<EventBroadcaster>());
 
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
@@ -36,6 +41,7 @@ api.MapArtifactEndpoints();
 api.MapMetricsEndpoints();
 api.MapReviewEndpoints();
 api.MapHealthEndpoints();
+api.MapEventStreamEndpoints();
 
 app.Run();
 
