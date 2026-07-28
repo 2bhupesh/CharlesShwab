@@ -19,8 +19,9 @@ public sealed class MockLlmProvider : ILlmProvider
     {
         var scenario = request.Metadata?.GetValueOrDefault("scenario") ?? "default";
         var agent = request.Metadata?.GetValueOrDefault("agent") ?? "unknown";
+        var variant = request.Metadata?.GetValueOrDefault("node");
 
-        var body = _catalog.Resolve(scenario, agent)
+        var body = _catalog.Resolve(scenario, agent, variant)
             ?? throw new InvalidOperationException(
                 $"No mock response for scenario '{scenario}', agent '{agent}'. " +
                 "Add Llm/Mock/Responses/{scenario}.{agent}.json (or default.{agent}.json).");

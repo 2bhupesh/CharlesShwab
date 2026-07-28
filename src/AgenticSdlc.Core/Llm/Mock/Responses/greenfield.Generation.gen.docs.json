@@ -1,0 +1,13 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "kind": "doc",
+      "content": "# URL Shortener\n\nA minimal URL shortener service built with ASP.NET minimal APIs on .NET 10.\n\n## Endpoints\n\n| Method | Route      | Description                                                        |\n|--------|------------|--------------------------------------------------------------------|\n| POST   | `/links`   | Body `{ \"url\": \"https://...\" }` → `{ \"code\", \"shortUrl\" }`.        |\n| GET    | `/{code}`  | 302 redirect to the original URL, or 404 if the code is unknown.   |\n\nInvalid (non-absolute or non-http/https) URLs return `400` with a problem description.\n\n## Design\n\n- **`ILinkStore`** abstracts storage. `InMemoryLinkStore` is the v1 implementation; a database-backed\n  store can be dropped in without touching the API layer.\n- **`ShortCode`** generates 7-character URL-safe codes, retried on the rare collision.\n- **`UrlValidator`** enforces absolute http/https targets.\n\n## Running\n\n```bash\ndotnet run --project src/UrlShortener.Api\n```\n\n## Testing\n\n```bash\ndotnet test\n```\n\n## Swapping storage\n\nImplement `ILinkStore` and register it in `Program.cs`:\n\n```csharp\nbuilder.Services.AddSingleton<ILinkStore, YourDatabaseLinkStore>();\n```\n"
+    }
+  ],
+  "buildNotes": "Developer documentation.",
+  "requirementIds": [
+    "FR-6"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "selectedStyle": "Modular monolith with ASP.NET minimal APIs",
+  "alternatives": [
+    { "name": "Modular monolith", "pros": ["Simple to deploy", "Fast to build for v1"], "cons": ["Single scaling unit"] },
+    { "name": "Microservices", "pros": ["Independent scaling"], "cons": ["Operational overhead unjustified for a v1 shortener"] }
+  ],
+  "adrs": [
+    { "id": "ADR-1", "title": "Use ASP.NET minimal APIs on .NET 10", "context": "The service exposes two small HTTP endpoints.", "decision": "Adopt minimal APIs rather than MVC controllers.", "consequences": "Low-ceremony endpoints with less boilerplate.", "requirementIds": ["NFR-1"] },
+    { "id": "ADR-2", "title": "Abstract storage behind ILinkStore", "context": "Storage is in-memory for v1 but must be replaceable.", "decision": "Introduce an ILinkStore interface with an InMemoryLinkStore implementation.", "consequences": "A database-backed store can be added later without touching the API layer.", "requirementIds": ["FR-6", "NFR-2"] },
+    { "id": "ADR-3", "title": "Random collision-checked short codes", "context": "Codes must be URL-safe, 6-8 characters, and collision-free.", "decision": "Generate 7-character URL-safe codes and retry on the rare collision.", "consequences": "Collision-free without external coordination.", "requirementIds": ["FR-5"] }
+  ],
+  "components": [
+    { "name": "Api", "responsibility": "HTTP endpoints, URL validation, and short-URL construction", "dependsOn": ["LinkStore"] },
+    { "name": "LinkStore", "responsibility": "Create and resolve links; generate codes", "dependsOn": [] }
+  ],
+  "serviceContracts": [
+    { "operation": "CreateLink", "method": "POST", "path": "/links", "requestShape": "{ \"url\": \"string\" }", "responseShape": "200 { \"code\": \"string\", \"shortUrl\": \"string\" } or 400 problem" },
+    { "operation": "Resolve", "method": "GET", "path": "/{code}", "requestShape": "code path parameter", "responseShape": "302 redirect to target, or 404" }
+  ],
+  "techStack": [
+    { "area": "Language/runtime", "choice": "C# on .NET 10", "rationale": "Required by the specification." },
+    { "area": "Testing", "choice": "xUnit", "rationale": "Required by the specification." },
+    { "area": "Storage", "choice": "In-memory behind ILinkStore", "rationale": "No external database for v1; interface keeps it swappable." }
+  ],
+  "componentDiagramMermaid": "graph TD; Client-->Api; Api-->LinkStore"
+}

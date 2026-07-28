@@ -39,7 +39,7 @@ public sealed class EngineeringPlanningAgent : AgentBase<PlanOutput>
         "Produce an executable engineering plan for the following specification and context.\n\n" +
         RenderContext(ctx);
 
-    protected override AgentResult MapOutput(PlanOutput output, AgentTaskInput input, WorkflowContext ctx)
+    protected override Task<AgentResult> MapOutputAsync(PlanOutput output, AgentTaskInput input, WorkflowContext ctx, CancellationToken ct)
     {
         var planArtifact = new ArtifactDraft(
             ArtifactType.WorkPlan,
@@ -64,13 +64,13 @@ public sealed class EngineeringPlanningAgent : AgentBase<PlanOutput>
             Array.Empty<AlternativeDraft>(),
             output.Tasks.SelectMany(t => t.RequirementIds).Distinct().ToList());
 
-        return new AgentResult(
+        return Task.FromResult(new AgentResult(
             new[] { planArtifact },
             new[] { decision },
             Array.Empty<RiskDraft>(),
             Array.Empty<RequirementDraft>(),
             followUps,
-            $"Planned {output.Tasks.Count} tasks across {output.Milestones.Count} milestones.");
+            $"Planned {output.Tasks.Count} tasks across {output.Milestones.Count} milestones."));
     }
 
     private static AgentType ParseAgent(string value) =>

@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "path": "src/UrlShortener.Api/UrlShortener.Api.csproj",
+      "kind": "project",
+      "content": "<Project Sdk=\"Microsoft.NET.Sdk.Web\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <Nullable>enable</Nullable>\n    <ImplicitUsings>enable</ImplicitUsings>\n  </PropertyGroup>\n  <ItemGroup>\n    <ProjectReference Include=\"..\\UrlShortener.Core\\UrlShortener.Core.csproj\" />\n  </ItemGroup>\n</Project>\n"
+    },
+    {
+      "path": "src/UrlShortener.Api/Program.cs",
+      "kind": "source",
+      "content": "using UrlShortener.Core;\n\nvar builder = WebApplication.CreateBuilder(args);\nbuilder.Services.AddSingleton<ILinkStore, InMemoryLinkStore>();\n\nvar app = builder.Build();\n\n// Create a short link for an absolute http/https URL.\napp.MapPost(\"/links\", (CreateLinkRequest request, ILinkStore store, HttpContext ctx) =>\n{\n    if (!UrlValidator.IsValid(request.Url))\n        return Results.Problem(\"Target URL must be an absolute http/https URL.\", statusCode: StatusCodes.Status400BadRequest);\n\n    var link = store.Create(request.Url);\n    var shortUrl = $\"{ctx.Request.Scheme}://{ctx.Request.Host}/{link.Code}\";\n    return Results.Ok(new CreateLinkResponse(link.Code, shortUrl));\n});\n\n// Resolve a short code to its target with a 302 redirect, or 404 if unknown.\napp.MapGet(\"/{code}\", (string code, ILinkStore store) =>\n{\n    var link = store.Get(code);\n    return link is null ? Results.NotFound() : Results.Redirect(link.TargetUrl, permanent: false);\n});\n\napp.Run();\n\npublic record CreateLinkRequest(string Url);\npublic record CreateLinkResponse(string Code, string ShortUrl);\n"
+    }
+  ],
+  "buildNotes": "Minimal API endpoints with URL validation, redirect, and not-found handling.",
+  "requirementIds": [
+    "FR-1",
+    "FR-2",
+    "FR-3",
+    "FR-4"
+  ]
+}

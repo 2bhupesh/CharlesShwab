@@ -43,9 +43,18 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<AnthropicLlmProvider>();
         services.AddSingleton<ILlmProvider, LlmProviderSelector>();
 
+        // Workspace + toolchain (real dotnet build/test).
+        services.AddSingleton<Workspace.WorkspaceManager>();
+        services.AddSingleton<Workspace.DotnetCliRunner>();
+
         // Agents: each registered under IAgent so the registry can resolve by type (NFR-9).
         services.AddSingleton<IAgent, RequirementIntelligenceAgent>();
         services.AddSingleton<IAgent, EngineeringPlanningAgent>();
+        services.AddSingleton<IAgent, ArchitectureReasoningAgent>();
+        services.AddSingleton<IAgent, RiskAssessmentAgent>();
+        services.AddSingleton<IAgent, BrownfieldReasoningAgent>();
+        services.AddSingleton<IAgent, EngineeringGenerationAgent>();
+        services.AddSingleton<IAgent, ValidationAgent>();
         services.AddSingleton<AgentRegistry>();
 
         // Governance: real gate evaluator plus the five policies, approval, and re-plan services.

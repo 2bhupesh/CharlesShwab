@@ -37,7 +37,7 @@ public abstract class AgentBase<TOutput> : IAgent
     protected abstract string BuildUserPrompt(AgentTaskInput input, WorkflowContext ctx);
 
     /// <summary>Maps validated structured output into artifacts, decisions, risks, and follow-ups.</summary>
-    protected abstract AgentResult MapOutput(TOutput output, AgentTaskInput input, WorkflowContext ctx);
+    protected abstract Task<AgentResult> MapOutputAsync(TOutput output, AgentTaskInput input, WorkflowContext ctx, CancellationToken ct);
 
     public async Task<AgentResult> ExecuteAsync(AgentTaskInput input, WorkflowContext ctx, CancellationToken ct)
     {
@@ -45,7 +45,8 @@ public abstract class AgentBase<TOutput> : IAgent
         var metadata = new Dictionary<string, string>
         {
             ["agent"] = Type.ToString(),
-            ["scenario"] = ctx.ScenarioKey
+            ["scenario"] = ctx.ScenarioKey,
+            ["node"] = input.NodeKey // lets the mock return per-node responses (e.g. per generation task)
         };
 
         string? lastError = null;
@@ -61,7 +62,7 @@ public abstract class AgentBase<TOutput> : IAgent
             await RecordExecutionAsync(input, messages, response, ok, error, (int)sw.ElapsedMilliseconds, ct);
 
             if (ok)
-                return MapOutput(value!, input, ctx);
+                return await MapOutputAsync(value!, input, ctx, ct);
 
             lastError = error;
             // Feed the malformed reply back and ask for a clean retry (cheap, in-conversation).

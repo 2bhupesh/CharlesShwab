@@ -1,0 +1,18 @@
+{
+  "files": [
+    {
+      "path": "tests/UrlShortener.Tests/UrlShortener.Tests.csproj",
+      "kind": "project",
+      "content": "<Project Sdk=\"Microsoft.NET.Sdk\">\n  <PropertyGroup>\n    <TargetFramework>net10.0</TargetFramework>\n    <Nullable>enable</Nullable>\n    <ImplicitUsings>enable</ImplicitUsings>\n    <IsPackable>false</IsPackable>\n  </PropertyGroup>\n  <ItemGroup>\n    <PackageReference Include=\"Microsoft.NET.Test.Sdk\" Version=\"17.12.0\" />\n    <PackageReference Include=\"xunit\" Version=\"2.9.2\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.8.2\" />\n  </ItemGroup>\n  <ItemGroup>\n    <ProjectReference Include=\"..\\..\\src\\UrlShortener.Core\\UrlShortener.Core.csproj\" />\n  </ItemGroup>\n</Project>\n"
+    },
+    {
+      "path": "tests/UrlShortener.Tests/LinkTests.cs",
+      "kind": "test",
+      "content": "using UrlShortener.Core;\nusing Xunit;\n\nnamespace UrlShortener.Tests;\n\npublic class LinkTests\n{\n    [Fact]\n    public void Create_stores_and_returns_a_resolvable_link()\n    {\n        var store = new InMemoryLinkStore();\n        var link = store.Create(\"https://example.com/page\");\n        Assert.Equal(\"https://example.com/page\", store.Get(link.Code)?.TargetUrl);\n    }\n\n    [Fact]\n    public void Unknown_code_resolves_to_null()\n    {\n        Assert.Null(new InMemoryLinkStore().Get(\"missing\"));\n    }\n\n    [Theory]\n    [InlineData(\"https://a.com\", true)]\n    [InlineData(\"http://a.com\", true)]\n    [InlineData(\"ftp://a.com\", false)]\n    [InlineData(\"not-a-url\", false)]\n    [InlineData(\"\", false)]\n    public void Validates_absolute_http_urls(string url, bool expected)\n    {\n        Assert.Equal(expected, UrlValidator.IsValid(url));\n    }\n\n    [Fact]\n    public void Codes_are_url_safe_and_sized()\n    {\n        var code = ShortCode.Generate();\n        Assert.InRange(code.Length, 6, 8);\n        Assert.Matches(\"^[A-Za-z0-9]+$\", code);\n    }\n\n    [Fact]\n    public void Codes_are_unique_across_links()\n    {\n        var store = new InMemoryLinkStore();\n        var a = store.Create(\"https://a.com\");\n        var b = store.Create(\"https://b.com\");\n        Assert.NotEqual(a.Code, b.Code);\n    }\n}\n"
+    }
+  ],
+  "buildNotes": "xUnit tests for creation, resolution, validation, and code format.",
+  "requirementIds": [
+    "FR-7"
+  ]
+}

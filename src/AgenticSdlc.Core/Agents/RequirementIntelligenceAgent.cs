@@ -47,7 +47,7 @@ public sealed class RequirementIntelligenceAgent : AgentBase<SpecOutput>
         return prompt;
     }
 
-    protected override AgentResult MapOutput(SpecOutput output, AgentTaskInput input, WorkflowContext ctx)
+    protected override Task<AgentResult> MapOutputAsync(SpecOutput output, AgentTaskInput input, WorkflowContext ctx, CancellationToken ct)
     {
         var requirements = new List<RequirementDraft>();
         foreach (var r in output.FunctionalRequirements)
@@ -80,12 +80,12 @@ public sealed class RequirementIntelligenceAgent : AgentBase<SpecOutput>
                       $"{output.NonFunctionalRequirements.Count} non-functional requirements, " +
                       $"{output.Ambiguities.Count(a => a.IsBlocking)} blocking ambiguities.";
 
-        return new AgentResult(
+        return Task.FromResult(new AgentResult(
             new[] { specArtifact },
             new[] { decision },
             Array.Empty<RiskDraft>(),
             requirements,
             Array.Empty<ProposedTask>(),
-            summary);
+            summary));
     }
 }

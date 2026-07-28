@@ -37,11 +37,14 @@ public sealed class MockResponseCatalog
     public int Count => _byKey.Count;
 
     /// <summary>
-    /// Resolves a canned response for <paramref name="scenario"/> + <paramref name="agent"/>, falling
-    /// back to <c>default.{agent}</c>. Returns null when neither exists.
+    /// Resolves a canned response, most specific first: <c>{scenario}.{agent}.{variant}</c> (e.g. a
+    /// per-node generation response), then <c>{scenario}.{agent}</c>, then <c>default.{agent}</c>.
+    /// Returns null when none exists.
     /// </summary>
-    public string? Resolve(string scenario, string agent)
+    public string? Resolve(string scenario, string agent, string? variant = null)
     {
+        if (!string.IsNullOrEmpty(variant) && _byKey.TryGetValue($"{scenario}.{agent}.{variant}", out var perNode))
+            return perNode;
         if (_byKey.TryGetValue($"{scenario}.{agent}", out var scoped))
             return scoped;
         if (_byKey.TryGetValue($"default.{agent}", out var fallback))
