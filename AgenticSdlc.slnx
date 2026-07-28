@@ -3,4 +3,7 @@
     <Project Path="src/AgenticSdlc.Core/AgenticSdlc.Core.csproj" />
     <Project Path="src/AgenticSdlc.Web/AgenticSdlc.Web.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AgenticSdlc.Core.Tests/AgenticSdlc.Core.Tests.csproj" />
+  </Folder>
 </Solution>

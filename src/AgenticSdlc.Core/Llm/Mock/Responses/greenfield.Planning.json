@@ -1,0 +1,14 @@
+{
+  "milestones": [
+    { "id": "MS-1", "name": "Core service implemented", "exitCriteria": "Domain, storage, and API endpoints generated and compiling." },
+    { "id": "MS-2", "name": "Validated release", "exitCriteria": "All tests pass under dotnet test and documentation is present." }
+  ],
+  "tasks": [
+    { "id": "domain", "name": "Domain model and storage abstraction", "description": "Create the project scaffold (csproj), the Link record, the ILinkStore interface, InMemoryLinkStore, and a short-code generator with collision retry.", "agent": "Generation", "phase": "Generation", "dependsOn": [], "parallelizable": false, "estimateHours": 3, "requirementIds": ["FR-5", "FR-6", "NFR-1", "NFR-2"] },
+    { "id": "api", "name": "HTTP API endpoints", "description": "Implement Program.cs minimal API: POST /links with URL validation, GET /{code} redirect, 404 for unknown, 400 for invalid URLs.", "agent": "Generation", "phase": "Generation", "dependsOn": ["domain"], "parallelizable": false, "estimateHours": 3, "requirementIds": ["FR-1", "FR-2", "FR-3", "FR-4"] },
+    { "id": "tests", "name": "xUnit test suite", "description": "Add a test project exercising link creation, redirect, validation failures, and unknown codes via the in-memory store.", "agent": "Generation", "phase": "Generation", "dependsOn": ["domain", "api"], "parallelizable": true, "estimateHours": 2, "requirementIds": ["FR-7"] },
+    { "id": "docs", "name": "Developer documentation", "description": "Author a README describing the endpoints, how to run the service, and how to swap the storage implementation.", "agent": "Generation", "phase": "Generation", "dependsOn": ["api"], "parallelizable": true, "estimateHours": 1, "requirementIds": ["FR-6"] }
+  ],
+  "syncPoints": ["tests"],
+  "criticalPath": ["domain", "api", "tests"]
+}

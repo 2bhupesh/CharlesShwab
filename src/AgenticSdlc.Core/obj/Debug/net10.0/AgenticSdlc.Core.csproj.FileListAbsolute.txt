@@ -1,0 +1,13 @@
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\bin\Debug\net10.0\AgenticSdlc.Core.deps.json
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\bin\Debug\net10.0\AgenticSdlc.Core.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\bin\Debug\net10.0\AgenticSdlc.Core.pdb
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.csproj.AssemblyReference.cache
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.AssemblyInfoInputs.cache
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.AssemblyInfo.cs
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.csproj.CoreCompileInputs.cache
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.sourcelink.json
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\refint\AgenticSdlc.Core.dll
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\AgenticSdlc.Core.pdb
+C:\Bhupesh\CharlesShwab\src\AgenticSdlc.Core\obj\Debug\net10.0\ref\AgenticSdlc.Core.dll

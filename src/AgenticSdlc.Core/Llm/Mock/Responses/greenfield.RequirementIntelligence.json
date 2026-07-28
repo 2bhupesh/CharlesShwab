@@ -1,0 +1,22 @@
+{
+  "intentSummary": "Build a URL shortener HTTP service that creates short codes for long URLs and redirects visitors from a short code to the original target. Storage is abstracted so an in-memory implementation can be swapped for a database later.",
+  "functionalRequirements": [
+    { "id": "FR-1", "title": "Create short link", "description": "POST /links accepts a JSON body containing a target URL and returns a generated short code plus the fully-qualified short URL.", "priority": "High", "sourceExcerpt": "POST /links accepts a JSON body with a target URL and returns a short code and the short URL" },
+    { "id": "FR-2", "title": "Redirect by code", "description": "GET /{code} responds 302 Found redirecting to the original target URL.", "priority": "High", "sourceExcerpt": "GET /{code} responds 302 redirecting to the original URL" },
+    { "id": "FR-3", "title": "Unknown code handling", "description": "Requests for a code that does not exist return 404 Not Found.", "priority": "High", "sourceExcerpt": "unknown codes return 404" },
+    { "id": "FR-4", "title": "Target URL validation", "description": "Target URLs must be absolute http/https URLs; invalid input returns 400 with a problem description.", "priority": "High", "sourceExcerpt": "target URLs must be validated as absolute http/https URLs — invalid input returns 400" },
+    { "id": "FR-5", "title": "Collision-free short codes", "description": "Short codes are 6-8 URL-safe characters and must be unique across existing links.", "priority": "Medium", "sourceExcerpt": "short codes are 6–8 URL-safe characters and collision-free" },
+    { "id": "FR-6", "title": "Pluggable storage", "description": "Persistence is hidden behind an interface so the in-memory store can be replaced by a database without touching the API layer.", "priority": "Medium", "sourceExcerpt": "storage may be in-memory for v1 but must be isolated behind an interface" },
+    { "id": "FR-7", "title": "Automated tests", "description": "Unit tests cover link creation, redirect behavior, validation failures, and unknown codes.", "priority": "High", "sourceExcerpt": "include unit tests covering link creation, redirect behavior, validation failures, and unknown codes" }
+  ],
+  "nonFunctionalRequirements": [
+    { "id": "NFR-1", "title": "Technology stack", "description": "C# with ASP.NET minimal APIs on .NET 10, xUnit for tests, no external database, no authentication.", "priority": "High", "sourceExcerpt": "C# with ASP.NET minimal APIs on .NET 10, xUnit for tests, no external database, no authentication" },
+    { "id": "NFR-2", "title": "Maintainability", "description": "Storage isolated behind an interface to keep the design open for extension.", "priority": "Medium", "sourceExcerpt": "isolated behind an interface so a database can be added later" }
+  ],
+  "ambiguities": [],
+  "assumptions": [
+    { "id": "AS-1", "text": "The public base URL used to build returned short URLs is configurable and defaults to the request host.", "rationale": "The requirement returns a short URL but does not specify the host; deriving it from the request is the least surprising default." },
+    { "id": "AS-2", "text": "Short codes are generated at random from a URL-safe alphabet with a retry on the rare collision.", "rationale": "Random generation with a uniqueness check satisfies both the collision-free and URL-safe constraints without external coordination." }
+  ],
+  "openQuestions": []
+}
