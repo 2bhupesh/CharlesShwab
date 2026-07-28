@@ -1,0 +1,22 @@
+{
+  "selectedStyle": "Incremental extension of the existing modular monolith",
+  "alternatives": [
+    { "name": "Extend in place", "pros": ["Minimal churn", "Preserves contracts and tests"], "cons": ["Touches core types"] },
+    { "name": "Separate analytics service", "pros": ["Isolation"], "cons": ["Operational overhead unjustified for this change"] }
+  ],
+  "adrs": [
+    { "id": "ADR-1", "title": "Extend ILinkStore additively", "context": "Existing callers and tests must keep working.", "decision": "Add an optional expiresAt to Create and new RecordClick/GetStats members.", "consequences": "Backward compatible; the in-memory store gains click tracking.", "requirementIds": ["FR-1", "FR-2", "NFR-1"] },
+    { "id": "ADR-2", "title": "Return 410 Gone for expired links", "context": "Expired links must be distinguishable from unknown ones.", "decision": "Check expiry in GET /{code} and return 410.", "consequences": "Clear, correct semantics for clients.", "requirementIds": ["FR-1"] }
+  ],
+  "components": [
+    { "name": "Core", "responsibility": "Link with expiry; store with click tracking", "dependsOn": [] },
+    { "name": "Api", "responsibility": "Expiry and analytics endpoints", "dependsOn": ["Core"] }
+  ],
+  "serviceContracts": [
+    { "operation": "Stats", "method": "GET", "path": "/links/{code}/stats", "requestShape": "code path parameter", "responseShape": "{ \"clickCount\": number, \"lastClickedAt\": timestamp|null }" }
+  ],
+  "techStack": [
+    { "area": "Approach", "choice": "In-place additive extension", "rationale": "Preserves the existing abstraction and passing tests." }
+  ],
+  "componentDiagramMermaid": "graph TD; Client-->Api; Api-->Core"
+}

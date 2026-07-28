@@ -1,0 +1,13 @@
+{
+  "intentSummary": "The request is too vague to implement as stated: 'share links better' could mean several different things.",
+  "functionalRequirements": [],
+  "nonFunctionalRequirements": [],
+  "ambiguities": [
+    { "text": "'Share links better' does not name a concrete capability.", "clarifyingQuestion": "What specifically should the tool do — shorten long URLs, add click tracking, add link expiry, or something else?", "severity": "blocking" },
+    { "text": "The audience and constraints are unknown.", "clarifyingQuestion": "Who are the users (internal marketing only or public), and are there technology or hosting constraints?", "severity": "blocking" }
+  ],
+  "assumptions": [],
+  "openQuestions": [
+    { "id": "OQ-1", "text": "What does success look like for the marketing team?" }
+  ]
+}

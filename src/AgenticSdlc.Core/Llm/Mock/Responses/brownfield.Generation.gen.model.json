@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "src/UrlShortener.Core/LinkStore.cs",
+      "kind": "source",
+      "content": "using System.Collections.Concurrent;\n\nnamespace UrlShortener.Core;\n\n/// <summary>A shortened link; may optionally expire.</summary>\npublic sealed record Link(string Code, string TargetUrl, DateTimeOffset CreatedAt, DateTimeOffset? ExpiresAt = null)\n{\n    public bool IsExpired(DateTimeOffset now) => ExpiresAt is { } e && now >= e;\n}\n\n/// <summary>Click analytics for a link.</summary>\npublic sealed record LinkStats(int ClickCount, DateTimeOffset? LastClickedAt);\n\n/// <summary>Storage abstraction so the in-memory store can be replaced by a database later.</summary>\npublic interface ILinkStore\n{\n    Link Create(string targetUrl, DateTimeOffset? expiresAt = null);\n    Link? Get(string code);\n    void RecordClick(string code, DateTimeOffset at);\n    LinkStats? GetStats(string code);\n}\n\n/// <summary>In-memory link store with collision-checked codes, expiry, and click analytics.</summary>\npublic sealed class InMemoryLinkStore : ILinkStore\n{\n    private sealed class Entry\n    {\n        public required Link Link;\n        public int Clicks;\n        public DateTimeOffset? LastClicked;\n    }\n\n    private readonly ConcurrentDictionary<string, Entry> _links = new();\n\n    public Link Create(string targetUrl, DateTimeOffset? expiresAt = null)\n    {\n        while (true)\n        {\n            var code = ShortCode.Generate();\n            var link = new Link(code, targetUrl, DateTimeOffset.UtcNow, expiresAt);\n            if (_links.TryAdd(code, new Entry { Link = link }))\n                return link;\n        }\n    }\n\n    public Link? Get(string code) => _links.TryGetValue(code, out var e) ? e.Link : null;\n\n    public void RecordClick(string code, DateTimeOffset at)\n    {\n        if (_links.TryGetValue(code, out var e))\n            lock (e) { e.Clicks++; e.LastClicked = at; }\n    }\n\n    public LinkStats? GetStats(string code) =>\n        _links.TryGetValue(code, out var e) ? new LinkStats(e.Clicks, e.LastClicked) : null;\n}\n\n/// <summary>Generates URL-safe short codes.</summary>\npublic static class ShortCode\n{\n    private const string Alphabet = \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\";\n\n    public static string Generate(int length = 7)\n    {\n        var chars = new char[length];\n        for (var i = 0; i < length; i++)\n            chars[i] = Alphabet[Random.Shared.Next(Alphabet.Length)];\n        return new string(chars);\n    }\n}\n\n/// <summary>Validates that a target URL is an absolute http/https URL.</summary>\npublic static class UrlValidator\n{\n    public static bool IsValid(string? url) =>\n        Uri.TryCreate(url, UriKind.Absolute, out var uri) &&\n        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);\n}\n"
+    }
+  ],
+  "buildNotes": "Extend Link with expiry and the store with click analytics; keep the ILinkStore abstraction.",
+  "requirementIds": [
+    "FR-1",
+    "FR-2",
+    "NFR-2"
+  ]
+}

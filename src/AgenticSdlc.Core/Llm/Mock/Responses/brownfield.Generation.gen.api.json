@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "path": "src/UrlShortener.Api/Program.cs",
+      "kind": "source",
+      "content": "using UrlShortener.Core;\n\nvar builder = WebApplication.CreateBuilder(args);\nbuilder.Services.AddSingleton<ILinkStore, InMemoryLinkStore>();\n\nvar app = builder.Build();\n\n// Create a short link for an absolute http/https URL, optionally with an expiry.\napp.MapPost(\"/links\", (CreateLinkRequest request, ILinkStore store, HttpContext ctx) =>\n{\n    if (!UrlValidator.IsValid(request.Url))\n        return Results.Problem(\"Target URL must be an absolute http/https URL.\", statusCode: StatusCodes.Status400BadRequest);\n\n    var link = store.Create(request.Url, request.ExpiresAt);\n    var shortUrl = $\"{ctx.Request.Scheme}://{ctx.Request.Host}/{link.Code}\";\n    return Results.Ok(new CreateLinkResponse(link.Code, shortUrl));\n});\n\n// Resolve a short code: 404 unknown, 410 expired, otherwise record the click and 302 redirect.\napp.MapGet(\"/{code}\", (string code, ILinkStore store) =>\n{\n    var link = store.Get(code);\n    if (link is null) return Results.NotFound();\n    if (link.IsExpired(DateTimeOffset.UtcNow)) return Results.StatusCode(StatusCodes.Status410Gone);\n    store.RecordClick(code, DateTimeOffset.UtcNow);\n    return Results.Redirect(link.TargetUrl, permanent: false);\n});\n\n// Click analytics for a link.\napp.MapGet(\"/links/{code}/stats\", (string code, ILinkStore store) =>\n{\n    var stats = store.GetStats(code);\n    return stats is null ? Results.NotFound() : Results.Ok(stats);\n});\n\napp.Run();\n\npublic record CreateLinkRequest(string Url, DateTimeOffset? ExpiresAt = null);\npublic record CreateLinkResponse(string Code, string ShortUrl);\n"
+    }
+  ],
+  "buildNotes": "Accept expiresAt, return 410 for expired codes, record clicks, and add the stats endpoint.",
+  "requirementIds": [
+    "FR-1",
+    "FR-2"
+  ]
+}

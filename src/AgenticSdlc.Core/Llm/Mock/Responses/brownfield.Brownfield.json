@@ -1,0 +1,22 @@
+{
+  "repoSummary": "A minimal ASP.NET URL shortener: a Core library (ILinkStore, InMemoryLinkStore, ShortCode, UrlValidator), an Api project with POST /links and GET /{code}, and an xUnit test project.",
+  "modules": [
+    { "path": "src/UrlShortener.Core", "purpose": "Domain model and storage abstraction" },
+    { "path": "src/UrlShortener.Api", "purpose": "HTTP endpoints and validation" },
+    { "path": "tests/UrlShortener.Tests", "purpose": "Unit tests for the store and validation" }
+  ],
+  "dependencyFindings": [
+    "Api depends on Core through the ILinkStore abstraction.",
+    "Tests depend on Core and exercise the store directly."
+  ],
+  "impactAnalysis": [
+    { "proposedChange": "Add expiry to Link and an optional expiresAt to ILinkStore.Create", "affectedModules": ["src/UrlShortener.Core", "src/UrlShortener.Api"], "riskLevel": "Medium" },
+    { "proposedChange": "Add click recording and a stats endpoint", "affectedModules": ["src/UrlShortener.Core", "src/UrlShortener.Api"], "riskLevel": "Low" }
+  ],
+  "refactorings": [
+    { "title": "Extend ILinkStore additively rather than replacing it", "priority": "High", "rationale": "Preserves the existing abstraction and keeps the current tests valid." }
+  ],
+  "risks": [
+    { "id": "R-1", "category": "Technical", "severity": "Medium", "likelihood": "Medium", "title": "Signature change to ILinkStore.Create", "description": "Adding a parameter could break existing callers or tests.", "mitigation": "Make expiresAt an optional parameter with a default so existing calls still compile.", "requirementIds": ["NFR-1"] }
+  ]
+}

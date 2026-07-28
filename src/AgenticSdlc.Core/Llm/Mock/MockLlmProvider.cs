@@ -21,7 +21,13 @@ public sealed class MockLlmProvider : ILlmProvider
         var agent = request.Metadata?.GetValueOrDefault("agent") ?? "unknown";
         var variant = request.Metadata?.GetValueOrDefault("node");
 
-        var body = _catalog.Resolve(scenario, agent, variant)
+        // When a human reviewer has answered a clarification, prefer a '.clarified' response so the
+        // ambiguous scenario converges to a concrete spec on the re-run.
+        var clarified = request.Messages.Any(m =>
+            m.Content.Contains("provided by a human reviewer", StringComparison.OrdinalIgnoreCase));
+
+        var body = (clarified ? _catalog.ResolveExact(scenario, agent, "clarified") : null)
+            ?? _catalog.Resolve(scenario, agent, variant)
             ?? throw new InvalidOperationException(
                 $"No mock response for scenario '{scenario}', agent '{agent}'. " +
                 "Add Llm/Mock/Responses/{scenario}.{agent}.json (or default.{agent}.json).");

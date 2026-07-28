@@ -1,0 +1,7 @@
+{
+  "risks": [
+    { "id": "R-1", "category": "Reliability", "severity": "Medium", "likelihood": "Low", "title": "In-memory store loses data on restart", "description": "All shortened links vanish when the process restarts.", "mitigation": "Document as a v1 limitation; the ILinkStore abstraction allows a durable implementation to be added later.", "requirementIds": ["FR-6"] },
+    { "id": "R-2", "category": "Security", "severity": "Medium", "likelihood": "Medium", "title": "Open-redirect abuse", "description": "Arbitrary URLs can be shortened and reused in phishing.", "mitigation": "Validate scheme is http/https; consider an allow/block list in a later iteration.", "requirementIds": ["FR-4"] },
+    { "id": "R-3", "category": "Performance", "severity": "Low", "likelihood": "Low", "title": "Code-generation collisions at scale", "description": "The retry loop could slow as the code space fills.", "mitigation": "Increase code length when the load factor rises.", "requirementIds": ["FR-5"] }
+  ]
+}

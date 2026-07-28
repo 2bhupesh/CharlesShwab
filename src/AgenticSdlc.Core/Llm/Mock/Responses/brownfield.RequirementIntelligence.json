@@ -1,0 +1,16 @@
+{
+  "intentSummary": "Enhance the existing URL shortener with expiring links and click analytics without breaking current contracts or tests.",
+  "functionalRequirements": [
+    { "id": "FR-1", "title": "Expiring links", "description": "POST /links accepts an optional expiresAt UTC timestamp; resolving an expired code returns 410 Gone; links without expiresAt never expire.", "priority": "High", "sourceExcerpt": "expiring links — POST /links accepts an optional expiresAt ... returns 410 Gone" },
+    { "id": "FR-2", "title": "Click analytics", "description": "Record every successful redirect and expose GET /links/{code}/stats returning total click count and last-clicked timestamp.", "priority": "High", "sourceExcerpt": "click analytics ... GET /links/{code}/stats" }
+  ],
+  "nonFunctionalRequirements": [
+    { "id": "NFR-1", "title": "Backward compatibility", "description": "Do not break the existing POST /links and GET /{code} contracts; all existing tests must continue to pass.", "priority": "High", "sourceExcerpt": "do not break the existing ... contracts; all existing tests must continue to pass" },
+    { "id": "NFR-2", "title": "Reuse existing abstraction", "description": "Follow the existing code style and the existing ILinkStore abstraction.", "priority": "Medium", "sourceExcerpt": "follow the existing ... ILinkStore abstraction" }
+  ],
+  "ambiguities": [],
+  "assumptions": [
+    { "id": "AS-1", "text": "expiresAt is provided and compared in UTC.", "rationale": "The requirement specifies a UTC timestamp." }
+  ],
+  "openQuestions": []
+}

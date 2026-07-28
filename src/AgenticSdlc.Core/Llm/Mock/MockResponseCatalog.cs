@@ -51,4 +51,8 @@ public sealed class MockResponseCatalog
             return fallback;
         return null;
     }
+
+    /// <summary>Resolves only the exact <c>{scenario}.{agent}.{variant}</c> key, with no fallback.</summary>
+    public string? ResolveExact(string scenario, string agent, string variant) =>
+        _byKey.TryGetValue($"{scenario}.{agent}.{variant}", out var v) ? v : null;
 }

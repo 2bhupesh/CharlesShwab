@@ -1,0 +1,12 @@
+{
+  "milestones": [
+    { "id": "MS-1", "name": "Enhancement implemented", "exitCriteria": "Expiry and analytics added; existing and new tests pass." }
+  ],
+  "tasks": [
+    { "id": "model", "name": "Extend domain and storage", "description": "Add ExpiresAt to Link, an optional expiresAt to Create, and RecordClick/GetStats to ILinkStore and InMemoryLinkStore.", "agent": "Generation", "phase": "Generation", "dependsOn": [], "parallelizable": false, "estimateHours": 2, "requirementIds": ["FR-1", "FR-2", "NFR-2"] },
+    { "id": "api", "name": "Update endpoints", "description": "Accept expiresAt on POST /links, return 410 for expired codes, record clicks on redirect, and add GET /links/{code}/stats.", "agent": "Generation", "phase": "Generation", "dependsOn": ["model"], "parallelizable": false, "estimateHours": 2, "requirementIds": ["FR-1", "FR-2"] },
+    { "id": "tests", "name": "Extend the test suite", "description": "Keep the existing tests and add tests for expiry and click counting.", "agent": "Generation", "phase": "Generation", "dependsOn": ["model", "api"], "parallelizable": true, "estimateHours": 1, "requirementIds": ["NFR-1", "FR-1", "FR-2"] }
+  ],
+  "syncPoints": ["tests"],
+  "criticalPath": ["model", "api", "tests"]
+}

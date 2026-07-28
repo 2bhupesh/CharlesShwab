@@ -1,6 +1,7 @@
 using AgenticSdlc.Core.Domain;
 using AgenticSdlc.Core.Observability;
 using AgenticSdlc.Core.Persistence;
+using AgenticSdlc.Core.Workspace;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgenticSdlc.Core.Orchestration;
@@ -20,6 +21,7 @@ public sealed class WorkflowService
     private readonly AuditLogger _audit;
     private readonly ReplanService _replan;
     private readonly RollbackService _rollback;
+    private readonly WorkspaceManager _workspace;
     private readonly CoreOptions _options;
 
     public WorkflowService(
@@ -30,6 +32,7 @@ public sealed class WorkflowService
         AuditLogger audit,
         ReplanService replan,
         RollbackService rollback,
+        WorkspaceManager workspace,
         CoreOptions options)
     {
         _dbFactory = dbFactory;
@@ -39,6 +42,7 @@ public sealed class WorkflowService
         _audit = audit;
         _replan = replan;
         _rollback = rollback;
+        _workspace = workspace;
         _options = options;
     }
 
@@ -65,6 +69,11 @@ public sealed class WorkflowService
             });
             await db.SaveChangesAsync(ct);
         }
+
+        // Brownfield: seed the workspace with an existing codebase — a prior run's output when a
+        // source is given, otherwise the bundled sample — so the Brownfield agent has code to analyze.
+        if (scenarioKey.Equals("brownfield", StringComparison.OrdinalIgnoreCase))
+            SeedBrownfieldWorkspace(sourceWorkflowId, workspacePath);
 
         await _graphBuilder.BuildInitialGraphAsync(id, scenarioKey, ct);
         await _audit.LogAsync(id, null, AuditEventType.WorkflowCreated, "system",
@@ -113,6 +122,20 @@ public sealed class WorkflowService
         await db.SaveChangesAsync(ct);
         await _audit.LogAsync(id, null, AuditEventType.WorkflowResumed, "system", "Workflow resumed.");
         _signaler.Signal(id); // a fresh cancellation token is created lazily on next dispatch
+    }
+
+    private void SeedBrownfieldWorkspace(Guid? sourceWorkflowId, string workspacePath)
+    {
+        string? source = null;
+        if (sourceWorkflowId is { } src)
+        {
+            var prior = Path.Combine(CoreServiceCollectionExtensions.ResolvePath(_options.Workspace.Root), src.ToString(), "generated");
+            if (Directory.Exists(prior)) source = prior;
+        }
+        source ??= Path.Combine(CoreServiceCollectionExtensions.ResolvePath(_options.Workspace.SamplesRoot), "UrlShortener.Sample");
+
+        if (Directory.Exists(source))
+            _workspace.SeedFrom(source, workspacePath);
     }
 
     /// <summary>Re-runs a node and invalidates everything downstream (dynamic re-planning, FR-12).</summary>

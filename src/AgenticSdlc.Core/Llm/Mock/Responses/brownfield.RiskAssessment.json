@@ -1,0 +1,6 @@
+{
+  "risks": [
+    { "id": "R-1", "category": "Technical", "severity": "Medium", "likelihood": "Low", "title": "Breaking existing callers", "description": "Signature changes to ILinkStore could break the API or existing tests.", "mitigation": "Use an optional parameter and additive methods so existing calls still compile.", "requirementIds": ["NFR-1"] },
+    { "id": "R-2", "category": "Reliability", "severity": "Low", "likelihood": "Low", "title": "Click counts lost on restart", "description": "In-memory analytics are not durable.", "mitigation": "Document as a v1 limitation; persist analytics in a later iteration.", "requirementIds": ["FR-2"] }
+  ]
+}

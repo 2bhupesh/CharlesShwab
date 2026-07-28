@@ -51,6 +51,7 @@ public sealed class EngineHarness
         var graphBuilder = new GraphBuilder(db.Factory, options);
         var replan = new ReplanService(audit, db.Factory, signaler);
         var rollback = new RollbackService(replan);
+        var wsForService = new WorkspaceManager();
 
         IGateEvaluator gates;
         ApprovalService? approvals = null;
@@ -75,7 +76,7 @@ public sealed class EngineHarness
         var registry = new AgentRegistry(agents);
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
         var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options);
-        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, options);
+        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, wsForService, options);
 
         return new EngineHarness(db, options, service, engine, approvals);
     }
@@ -100,6 +101,7 @@ public sealed class EngineHarness
         var replan = new ReplanService(audit, db.Factory, signaler);
         var rollback = new RollbackService(replan);
         var workspace = new WorkspaceManager();
+        var wsForService = workspace;
         var cli = new DotnetCliRunner();
         ILlmProvider llm = new MockLlmProvider(new MockResponseCatalog());
 
@@ -129,7 +131,7 @@ public sealed class EngineHarness
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
         var reviewPackage = new ReviewPackageBuilder(db.Factory, workspace, new MetricsService(db.Factory), audit);
         var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options, reviewPackage);
-        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, options);
+        var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, wsForService, options);
 
         return new EngineHarness(db, options, service, engine, approvals);
     }
