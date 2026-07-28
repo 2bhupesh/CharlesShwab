@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using AgenticSdlc.Core.Abstractions;
 using AgenticSdlc.Core.Domain;
 using AgenticSdlc.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -7,15 +8,20 @@ namespace AgenticSdlc.Core.Observability;
 
 /// <summary>
 /// Append-only audit writer (spec §9.1). Assigns a monotonic per-workflow sequence; a per-workflow
-/// lock serializes sequence assignment so parallel executors never collide. WP-8 extends this to
-/// also publish to the event bus for the dashboard.
+/// lock serializes sequence assignment so parallel executors never collide. Each row is also
+/// published to the event bus so the dashboard can react in real time.
 /// </summary>
 public class AuditLogger
 {
     private readonly IDbContextFactory<AgenticDbContext> _dbFactory;
+    private readonly IWorkflowEventBus? _bus;
     private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _locks = new();
 
-    public AuditLogger(IDbContextFactory<AgenticDbContext> dbFactory) => _dbFactory = dbFactory;
+    public AuditLogger(IDbContextFactory<AgenticDbContext> dbFactory, IWorkflowEventBus? bus = null)
+    {
+        _dbFactory = dbFactory;
+        _bus = bus;
+    }
 
     public virtual async Task LogAsync(
         Guid workflowId, Guid? nodeId, AuditEventType type, string actor, string summary,
@@ -46,5 +52,7 @@ public class AuditLogger
         {
             gate.Release();
         }
+
+        _bus?.Publish(new WorkflowEvent(type.ToString(), workflowId, nodeId, summary, DateTimeOffset.UtcNow));
     }
 }

@@ -68,8 +68,15 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<RollbackService>();
         services.AddSingleton<ApprovalService>();
 
-        // Observability.
-        services.AddSingleton<AuditLogger>();
+        // Observability + packaging.
+        services.AddSingleton<WorkflowEventBus>();
+        services.AddSingleton<Abstractions.IWorkflowEventBus>(sp => sp.GetRequiredService<WorkflowEventBus>());
+        services.AddSingleton<AuditLogger>(sp => new AuditLogger(
+            sp.GetRequiredService<IDbContextFactory<Persistence.AgenticDbContext>>(),
+            sp.GetRequiredService<Abstractions.IWorkflowEventBus>()));
+        services.AddSingleton<MetricsService>();
+        services.AddSingleton<TimelineService>();
+        services.AddSingleton<Packaging.ReviewPackageBuilder>();
 
         // Orchestration engine and its background runner.
         services.AddSingleton<WorkflowSignaler>();

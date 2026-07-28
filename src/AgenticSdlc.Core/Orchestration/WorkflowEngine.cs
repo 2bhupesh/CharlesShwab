@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using AgenticSdlc.Core.Domain;
 using AgenticSdlc.Core.Governance;
 using AgenticSdlc.Core.Observability;
+using AgenticSdlc.Core.Packaging;
 using AgenticSdlc.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ public sealed class WorkflowEngine
     private readonly NodeExecutor _executor;
     private readonly AuditLogger _audit;
     private readonly WorkflowSignaler _signaler;
+    private readonly ReviewPackageBuilder? _reviewPackage;
 
     private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _tickLocks = new();
     private readonly ConcurrentDictionary<Guid, byte> _inFlight = new();
@@ -32,13 +34,15 @@ public sealed class WorkflowEngine
         NodeExecutor executor,
         AuditLogger audit,
         WorkflowSignaler signaler,
-        CoreOptions options)
+        CoreOptions options,
+        ReviewPackageBuilder? reviewPackage = null)
     {
         _dbFactory = dbFactory;
         _gates = gates;
         _executor = executor;
         _audit = audit;
         _signaler = signaler;
+        _reviewPackage = reviewPackage;
         _slots = new SemaphoreSlim(Math.Max(1, options.Orchestration.MaxParallelNodes));
     }
 
@@ -146,8 +150,29 @@ public sealed class WorkflowEngine
 
                 if (node.AgentType is AgentType.Join or AgentType.Packaging)
                 {
-                    // System node: succeeds inline. Join = synchronization point; Packaging is hooked
-                    // to the review-package builder in WP-8.
+                    // System node: succeeds inline. Join = synchronization point. Packaging assembles
+                    // the review package when a builder is wired (the real platform); fake-agent tests
+                    // leave it null and it simply completes.
+                    if (node.AgentType == AgentType.Packaging && _reviewPackage is not null)
+                    {
+                        try
+                        {
+                            await _reviewPackage.BuildAsync(workflowId, node.Id, ct);
+                        }
+                        catch (Exception ex)
+                        {
+                            node.Status = NodeStatus.Failed;
+                            node.ErrorMessage = ex.Message;
+                            node.CompletedAt = now;
+                            await db.SaveChangesAsync(ct);
+                            await _audit.LogAsync(workflowId, node.Id, AuditEventType.NodeFailed, "system",
+                                $"Review packaging failed: {ex.Message}");
+                            await FailWorkflowAsync(db, wf, $"Packaging failed: {ex.Message}", ct);
+                            progressed = true;
+                            continue;
+                        }
+                    }
+
                     node.Status = NodeStatus.Succeeded;
                     node.StartedAt = now;
                     node.CompletedAt = now;

@@ -8,6 +8,7 @@ using AgenticSdlc.Core.Llm;
 using AgenticSdlc.Core.Llm.Mock;
 using AgenticSdlc.Core.Observability;
 using AgenticSdlc.Core.Orchestration;
+using AgenticSdlc.Core.Packaging;
 using AgenticSdlc.Core.Workspace;
 using Microsoft.EntityFrameworkCore;
 
@@ -126,7 +127,8 @@ public sealed class EngineHarness
 
         var registry = new AgentRegistry(agents);
         var executor = new NodeExecutor(db.Factory, contextBuilder, registry, gates, graphBuilder, audit, cancellation, signaler, options);
-        var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options);
+        var reviewPackage = new ReviewPackageBuilder(db.Factory, workspace, new MetricsService(db.Factory), audit);
+        var engine = new WorkflowEngine(db.Factory, gates, executor, audit, signaler, options, reviewPackage);
         var service = new WorkflowService(db.Factory, graphBuilder, signaler, cancellation, audit, replan, rollback, options);
 
         return new EngineHarness(db, options, service, engine, approvals);
